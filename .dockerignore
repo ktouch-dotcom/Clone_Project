@@ -1,0 +1,9 @@
+node_modules
+vendor
+.git
+.env.local
+.DS_Store
+.vscode
+laravel-app/node_modules
+laravel-app/vendor
+vuejs-app/node_modules
