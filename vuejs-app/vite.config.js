@@ -26,6 +26,13 @@ export default defineConfig({
       usePolling: true,
       useFsEvents: true,
       interval: 1000,
+    },
+    proxy: {
+      '/api': {
+        target: 'http://laravel-service:8000',
+        changeOrigin: true,
+        rewrite: (path) => path
+      }
     }
   }
 })

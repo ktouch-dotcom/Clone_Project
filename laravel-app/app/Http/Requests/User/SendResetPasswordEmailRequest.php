@@ -1,51 +1,31 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Http\Requests\User;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class ResetPasswordNotification extends Notification implements ShouldQueue
+class SendResetPasswordEmailRequest extends FormRequest
 {
-    use Queueable;
-    private $token;
-    private string $callback_url;
-
     /**
-     * Create a new notification instance.
+     * Determine if the user is authorized to make this request.
      */
-    public function __construct(string $token, string $callback_url)
+    public function authorize(): bool
     {
-        $this->token = $token;
-        $this->callback_url = $callback_url;
+        return true;
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Get the validation rules that apply to the request.
      *
-     * @return array<int, string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function via(object $notifiable): array
+    public function rules(): array
     {
-        return ['mail'];
-    }
+        return [
+            'email' => 'required|email|exists:users,email',
+            'callback_url' => 'required|url',
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail($notifiable)
-    {
-        $resetUrl = route('set.new-password', [
-            'token' => $this->token,
-            'email' => $notifiable->email,
-        ]);
-
-        return (new MailMessage)
-            ->subject('Reset Your Password')
-            ->line('Click the button below to set your new password.')
-            ->action('Set New Password', $this->callback_url . '?forwarded-url=' . urlencode($resetUrl))
-            ->line('If you did not request a password reset, no further action is required.');
+        ];
     }
 }

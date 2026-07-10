@@ -1,62 +1,30 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Http\Requests\User;
 
-use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-use URL;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class EmailVerificationNotification extends Notification implements ShouldQueue
+class SendVerificationEmailRequest extends FormRequest
 {
-    use Queueable;
-
-    private ?string $callback_url;
-
     /**
-     * Create a new notification instance.
+     * Determine if the user is authorized to make this request.
      */
-    public function __construct($callback_url = null)
+    public function authorize(): bool
     {
-        $this->callback_url = $callback_url;
+        return true;
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Get the validation rules that apply to the request.
      *
-     * @return array<int, string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function via(object $notifiable): array
+    public function rules(): array
     {
-        return ['mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        $verificationURL = $this->verificationURL($notifiable);
-
-        return (new MailMessage)
-            ->subject('Verify Email Address')
-            ->line('Click the button below to verify your email address.')
-            ->action('Verify Email', $this->callback_url . '?forwarded-url=' . urlencode($verificationURL))
-            ->line('If you did not create an account, no further action is required.')
-            ->line('This verification link will expire in 5 minutes.');
-    }
-
-    protected function verificationURL($notifiable)
-    {
-        return URL::temporarySignedRoute(
-            'verify.email',
-            Carbon::now()->addMinutes(5),
-            [
-                'id' => $notifiable->getKey(), // user id
-                'hash' => sha1($notifiable->getEmailForVerification()), // hash using user email
-            ]
-        );
+        return [
+            'email' => 'required|email|exists:users,email',
+            'callback_url' => 'required|url',
+        ];
     }
 }
