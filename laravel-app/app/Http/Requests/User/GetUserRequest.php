@@ -5,7 +5,7 @@ namespace App\Http\Requests\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SetNewPasswordRequest extends FormRequest
+class GetUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,9 @@ class SetNewPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|min:6|confirmed',
+            'keyword' => 'nullable|string|max:50',
+            'per_page' => 'nullable|integer|in:10,25,50,100,250',
+            'page' => 'nullable|integer|min:1',
         ];
     }
 }

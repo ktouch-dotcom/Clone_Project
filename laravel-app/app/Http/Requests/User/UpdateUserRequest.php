@@ -5,14 +5,14 @@ namespace App\Http\Requests\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SetNewPasswordRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->id !== (int) $this->route('id');
     }
 
     /**
@@ -23,9 +23,9 @@ class SetNewPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string|min:6|confirmed',
+            'name' => 'required|string|max:50',
+            'email' => 'required|email|unique:users,email,' . $this->route('id'),
+            'password' => 'nullable|string|min:6|max:10'
         ];
     }
 }
