@@ -1,14 +1,9 @@
 #!/bin/bash
 set -e
 
-composer install
-wait $!
-npm install
-wait $!
-php artisan key:generate
-wait $!
-php artisan migrate
-wait $!
-php artisan storage:link
-wait $!
-exec supervisord -c /etc/supervisor/conf.d/supervisord.development.conf
+composer install || true
+php artisan key:generate || true
+php artisan migrate --step || true
+php artisan storage:link || true
+
+exec php artisan serve --host=0.0.0.0 --port=8000
